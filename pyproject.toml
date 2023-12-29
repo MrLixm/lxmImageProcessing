@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "lxmImageProcessing"
+version = "0.1.0"
+description = "Custom resources for image-processing."
+authors = ["Liam Collod <lcollod@gmail.com>"]
+readme = "README.md"
+packages = [
+    { include = "lxmImageProcessing", from = "python/libraries" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+numpy = "1.26.*"
+colour-science = "0.4.3"
+rawpy = "0.19.0"
+openimageio = { path = "./vendor/OpenImageIO/OpenImageIO-2.2.18.0-cp310-cp310-win_amd64.whl", markers = "sys_platform == 'win32'" }
+
+[tool.poetry.dev-dependencies]
+black = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
