@@ -196,7 +196,7 @@ def main():
     for index, input_file in enumerate(input_files):
         LOGGER.info(f"{index + 1}/{files_number} processing {input_file}")
 
-        dst_path = OUTPUT_PATH_CALLABLE(INPUT_PATH)
+        dst_path = OUTPUT_PATH_CALLABLE(input_file)
         if dst_path.exists() and not OVERWRITE_EXISTING:
             LOGGER.warning(f"Already existing target file {dst_path}")
             return
