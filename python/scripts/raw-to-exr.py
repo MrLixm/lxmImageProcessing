@@ -30,18 +30,58 @@ EXIFTOOL_PATH = os.getenv("EXIFTOOL") or Path(
 os.environ["EXIFTOOL"] = str(EXIFTOOL_PATH)
 DEBUG_WRITE = True
 INPUT_DIR_RECURSIVE = True
-OVERWRITE_EXISTING = True
+OVERWRITE_EXISTING = False
 
-# // DEBAYERING
-HALF_SIZE = False
-DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
-MEDIAN_PASSES: int = 4  # higher is slower but less r-g-b pixels
-FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Light
-EXPOSURE_HDR_MERGE = True
-EXPOSURE_SHIFT: Optional[float] = None  # not used if EXPOSURE_HDR_MERGE==True
-# // WRITING
-EXR_BITDEPTH = OiioTypes.HALF
-EXR_COMPRESSION: str = "zips"
+# // DEBAYERING options
+
+# choose between "fastpreview", "normal", "hq", "uhq", "custom"
+PRESET = "normal"
+
+if PRESET == "fastpreview":
+    HALF_SIZE = True
+    DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
+    MEDIAN_PASSES: int = 0
+    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Off
+    EXPOSURE_HDR_MERGE = False
+    # to adjust depending on raw
+    EXPOSURE_SHIFT: Optional[float] = +2.0
+    EXR_BITDEPTH = OiioTypes.HALF
+    EXR_COMPRESSION: str = "dwaa:45"
+elif PRESET == "normal":
+    HALF_SIZE = False
+    DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
+    MEDIAN_PASSES: int = 0
+    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Light
+    EXPOSURE_HDR_MERGE = True
+    EXPOSURE_SHIFT: Optional[float] = None
+    # // WRITING
+    EXR_BITDEPTH = OiioTypes.HALF
+    EXR_COMPRESSION: str = "dwaa:30"
+elif PRESET.endswith("hq"):
+    HALF_SIZE = False
+    DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
+    MEDIAN_PASSES: int = 8
+    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Light
+    EXPOSURE_HDR_MERGE = True
+    EXPOSURE_SHIFT: Optional[float] = None
+    EXR_BITDEPTH = OiioTypes.HALF
+    EXR_COMPRESSION: str = "dwaa:15"
+    if PRESET == "uhq":
+        MEDIAN_PASSES = 10
+        BDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Full
+        EXR_COMPRESSION = "zips"
+else:
+    HALF_SIZE = False
+    DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
+    # higher is slower but less rgb pixel artefacts
+    MEDIAN_PASSES: int = 4
+    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Light
+    EXPOSURE_HDR_MERGE = True
+    # not used if EXPOSURE_HDR_MERGE==True
+    EXPOSURE_SHIFT: Optional[float] = None
+    # // WRITING
+    EXR_BITDEPTH = OiioTypes.HALF
+    EXR_COMPRESSION: str = "zips"
 
 
 def retrieve_output_path(src_path: Path) -> Path:
@@ -52,7 +92,7 @@ def retrieve_output_path(src_path: Path) -> Path:
             f".d-{DEMOSAIC_ALGORITHM.name}"
             f".m{MEDIAN_PASSES}"
             f".fbdd{FBDD_NOISE_REDUCTION.value}"
-            f".exr-{EXR_COMPRESSION}"
+            f".exr-{EXR_COMPRESSION.replace(':', '-')}"
             f".{'half' if HALF_SIZE else 'full'}"
             f".exr"
         )
@@ -99,6 +139,7 @@ def convert_raw_to_exr(
     # retrieve metadata
     rawpy_metadata = rawpyget_metadata(src_file_path, debayering_options)
 
+    LOGGER.debug("reading raw image ...")
     if hdr_merge:
         image_array = rawpyread_image_mergehdr(
             raw_path=src_file_path,
