@@ -47,7 +47,7 @@ EXR_COMPRESSION: str = "zips"
 def retrieve_output_path(src_path: Path) -> Path:
     if DEBUG_WRITE:
         name = (
-            f"test"
+            f"{src_path.name}"
             f".{'hdr' if EXPOSURE_HDR_MERGE else EXPOSURE_SHIFT}"
             f".d-{DEMOSAIC_ALGORITHM.name}"
             f".m{MEDIAN_PASSES}"
