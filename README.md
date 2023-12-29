@@ -57,3 +57,9 @@ some of the tools assume you have specific software available on your system :
 |-----------|----------------------------------------------------------------------------------------|
 | download  | https://exiftool.org/                                                                  |
 | configure | expected to have the path to the executable set in the `EXIFTOOL` environment variable |
+
+
+| Adobe DNG converter | https://helpx.adobe.com/camera-raw/digital-negative.html                                   |
+|---------------------|--------------------------------------------------------------------------------------------|
+| download            | https://helpx.adobe.com/camera-raw/digital-negative.html#downloads                         |
+| configure           | expected to have the path to the executable set in the `ADOBEDNGTOOL` environment variable |
