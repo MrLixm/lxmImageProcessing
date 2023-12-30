@@ -199,7 +199,7 @@ def main():
         dst_path = OUTPUT_PATH_CALLABLE(input_file)
         if dst_path.exists() and not OVERWRITE_EXISTING:
             LOGGER.warning(f"Already existing target file {dst_path}")
-            return
+            continue
 
         convert_raw_to_exr(
             src_file_path=input_file,
