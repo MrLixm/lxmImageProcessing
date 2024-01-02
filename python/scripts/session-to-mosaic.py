@@ -13,7 +13,7 @@ from typing import Callable
 LOGGER = logging.getLogger(Path(__file__).stem)
 
 # https://www.patreon.com/posts/openimageio-oiio-63609827
-OIIOTOOL: Path = os.getenv("OIIOTOOL") or Path(
+OIIOTOOL: Path = Path(os.getenv("OIIOTOOL")) or Path(
     r"F:\softwares\apps\oiio\build\2.3.10\oiiotool.exe",
 )
 assert OIIOTOOL.exists()
