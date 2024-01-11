@@ -11,15 +11,15 @@ from pathlib import Path
 LOGGER = logging.getLogger(Path(__file__).stem)
 
 INPUT_DIR = Path(
-    r"G:\personal\photo\workspace\dcim\2023\2023_12_27_tarentaise",
+    r"G:\personal\photo\workspace\dcim\2024\2024_01_11_negscan",
 )
-OUTPUT_DIR = Path(
-    r"G:\personal\photo\workspace\dcim\2023\2023_12_27_tarentaise\dng",
-)
+OUTPUT_DIR = INPUT_DIR / "dng"
 # https://helpx.adobe.com/camera-raw/digital-negative.html#downloads
 ADOBE_DNG_EXE = os.getenv("ADOBEDNGTOOL") or Path(
     r"C:\Program Files\Adobe\Adobe DNG Converter\Adobe DNG Converter.exe",
 )
+
+OVERWRITE_EXISTING = False
 
 
 def convert_rw2_to_dng(
@@ -45,12 +45,19 @@ def convert_rw2_to_dng(
 
 
 def main():
+    output_dir = OUTPUT_DIR
     input_files = list(INPUT_DIR.glob("*.RW2"))
     if not input_files:
         LOGGER.warning("no file found, returning ...")
         return
 
-    output_dir = OUTPUT_DIR
+    for input_file in list(input_files):
+        if (
+            output_dir / input_file.with_suffix(".dng").name
+        ).exists() and not OVERWRITE_EXISTING:
+            LOGGER.info(f"skipping {input_file}, output already exists")
+            input_files.remove(input_file)
+
     if not output_dir.exists():
         output_dir.mkdir()
 
