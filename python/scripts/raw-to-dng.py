@@ -26,6 +26,7 @@ ADOBE_DNG_ARGS = [
 RAW_EXTENSIONS = [
     ".NEF",
     ".CR2",
+    ".CR3",
     ".ORF",
     ".RW2",
     ".RAF",
