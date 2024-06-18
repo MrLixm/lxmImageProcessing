@@ -17,7 +17,7 @@ The package is not fully designed for public consumptions so use at your own ris
 | [rw2-to-dng.py](python/scripts/rw2-to-dng.py)                                   | batch converting panasonic raw file to dng (personal use)   | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
 | [session-to-mosaic.py](python/scripts/session-to-mosaic.py)                     | combine multiple image to a single big mosaic of image      | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
 | [ffmpeg-video-to-appleprores.py](python/scripts/ffmpeg-video-to-appleprores.py) | encode to apple prores using ffmpeg                         | script  | ![video](https://img.shields.io/badge/video-4c78a6)  |
-| [lxmImageProcessing](python/libraries/lxmImageProcessing)                       | python wrapper to interract with i-o libraries              | library | ![photo](https://img.shields.io/badge/photo-43896b)  |
+| [lxmImageProcessing](python/libraries/lxmimgproc)                       | python wrapper to interract with i-o libraries              | library | ![photo](https://img.shields.io/badge/photo-43896b)  |
 
 
 # installation

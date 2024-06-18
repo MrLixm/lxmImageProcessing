@@ -5,15 +5,15 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from lxmImageProcessing.rawpyio import rawpy
-from lxmImageProcessing.rawpyio import DebayeringOptionsType
-from lxmImageProcessing.rawpyio import rawpyread_image_mergehdr
-from lxmImageProcessing.rawpyio import rawpyread_image
-from lxmImageProcessing.rawpyio import rawpyget_metadata
-from lxmImageProcessing.oiioio import oiioconvert_array_to_image
-from lxmImageProcessing.oiioio import oiiowrite_buf_to_disk
-from lxmImageProcessing.oiioio import OiioTypes
-from lxmImageProcessing.exifio import exiftoolread_image_metadata
+from lxmimgproc.rawpyio import rawpy
+from lxmimgproc.rawpyio import DebayeringOptionsType
+from lxmimgproc.rawpyio import rawpyread_image_mergehdr
+from lxmimgproc.rawpyio import rawpyread_image
+from lxmimgproc.rawpyio import rawpyget_metadata
+from lxmimgproc.oiioio import oiioconvert_array_to_image
+from lxmimgproc.oiioio import oiiowrite_buf_to_disk
+from lxmimgproc.oiioio import OiioTypes
+from lxmimgproc.exifio import exiftoolread_image_metadata
 
 __VERSION__ = "1.0.0"
 LOGGER = logging.getLogger(Path(__file__).stem)
