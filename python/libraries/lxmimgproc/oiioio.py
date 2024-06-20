@@ -20,6 +20,31 @@ class OiioTypes(enum.Enum):
     DOUBLE = oiio.DOUBLE
 
 
+class OiioExrCompression(enum.Enum):
+    """
+    Enum list the different compression value that can be set for the
+    spec "compresion" attribute when writin OpenExrs.
+    """
+
+    none = "none"
+    rle = "rle"
+    zip = "zip"
+    zips = "zips"
+    piz = "piz"
+    pxr24 = "pxr24"
+    b44 = "b44"
+    b44a = "b44a"
+    dwaa = "dwaa"
+    dwab = "dwab"
+
+    def get_oiio_value(self, compression_amount: float | None = None) -> str:
+        if compression_amount and self not in [self.dwab, self.dwaa]:
+            raise ValueError(
+                f"Compression amount not supported for compression {self.name}"
+            )
+        return self.value + f":{compression_amount}" if compression_amount else ""
+
+
 _DTYPE_MAPPING: dict[numpy.typing.DTypeLike, oiio.TypeDesc] = {
     numpy.dtype(numpy.uint8): oiio.UINT8,
     numpy.dtype(numpy.uint16): oiio.UINT16,
