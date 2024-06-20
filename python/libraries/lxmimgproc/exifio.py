@@ -8,33 +8,9 @@ from typing import Optional
 LOGGER = logging.getLogger(__name__)
 
 
-def _get_exiftool_executable(exe_path: Optional[Path] = None) -> Optional[Path]:
-    """
-    Get the path to a valid exiftool system executable.
-
-    If no argument is provided the executable is attempted to be retrieved from:
-
-    * ``EXIFTOOL`` environment variable
-
-    Args:
-        exe_path: optional fileystem path to a potential file
-
-    Returns:
-        optional fileystem path to an existing executable file
-    """
-    if exe_path and exe_path.exists():
-        return exe_path
-
-    exe_path = os.getenv("EXIFTOOL")
-    if exe_path and Path(exe_path).exists():
-        return exe_path
-
-    return None
-
-
 def exiftoolget_raw_output(
     src_path: Path,
-    exiftool_path: Optional[Path] = None,
+    exiftool_path: Path,
     exiftool_args: Optional[list[str]] = None,
 ) -> str:
     """
@@ -42,18 +18,12 @@ def exiftoolget_raw_output(
 
     Args:
         src_path: filesystem path to an existing camera file to extract the metadata from.
-        exiftool_path: optional fileystem path to a potential exiftool executable
+        exiftool_path: fileystem path to the exiftool executable
         exiftool_args: list of additional arguments to provide to exiftool
 
     Returns:
         stdout output of exiftool as decoded str
     """
-    exiftool_path = _get_exiftool_executable(exiftool_path)
-    if not exiftool_path:
-        raise FileNotFoundError(
-            "No exiftool executable was provided or able to be found."
-        )
-
     exiftool_args = exiftool_args or []
 
     command = [str(exiftool_path)]
@@ -68,7 +38,7 @@ def exiftoolget_raw_output(
 
 def exiftoolread_image_metadata(
     image_path: Path,
-    exiftool_path: Optional[Path] = None,
+    exiftool_path: Path,
     exiftool_args: Optional[list[str]] = None,
     extract_binary: bool = False,
 ) -> dict[str, dict[str, str]]:
@@ -88,8 +58,7 @@ def exiftoolread_image_metadata(
     Args:
         image_path: fileystem path to an existing camera file
         exiftool_path:
-            optional fileystem path to a potential exiftool executable.
-            Guessed if not provided.
+            fileystem path to the exiftool executable
         exiftool_args:
             list of additional arguments to provide to exiftool.
             Note if the argument change the formatting then it might break the parsing.
