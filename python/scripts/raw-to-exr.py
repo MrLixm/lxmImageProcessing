@@ -35,7 +35,7 @@ OVERWRITE_EXISTING = False
 # // DEBAYERING options
 
 # choose between "fastpreview", "normal", "hq", "uhq", "custom"
-PRESET = "normal"
+PRESET = "neg"
 OUTPUT_COLORSPACE = rawpy.ColorSpace.raw
 
 if PRESET == "fastpreview":
@@ -145,6 +145,9 @@ def convert_raw_to_exr(
         image_array = rawpyread_image_mergehdr(
             raw_path=src_file_path,
             options=debayering_options,
+            exposure_start=1.0,
+            exposure_step=1.0,
+            exposure_stack_n=6,
         )
     else:
         image_array = rawpyread_image(
