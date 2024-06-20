@@ -28,7 +28,7 @@ EXIFTOOL_PATH = os.getenv("EXIFTOOL") or Path(
     r"F:\softwares\apps\exiftool\build\12.70\exiftool.exe",
 )
 os.environ["EXIFTOOL"] = str(EXIFTOOL_PATH)
-DEBUG_WRITE = True
+DEBUG_WRITE = False
 INPUT_DIR_RECURSIVE = True
 OVERWRITE_EXISTING = False
 
@@ -52,7 +52,7 @@ elif PRESET == "normal":
     HALF_SIZE = False
     DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
     MEDIAN_PASSES: int = 0
-    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Light
+    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Off
     EXPOSURE_HDR_MERGE = True
     EXPOSURE_SHIFT: Optional[float] = None
     # // WRITING
@@ -61,9 +61,9 @@ elif PRESET == "normal":
 elif PRESET.endswith("hq"):
     HALF_SIZE = False
     DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
-    MEDIAN_PASSES: int = 8
+    MEDIAN_PASSES: int = 2
     FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Light
-    EXPOSURE_HDR_MERGE = True
+    EXPOSURE_HDR_MERGE = False
     EXPOSURE_SHIFT: Optional[float] = None
     EXR_BITDEPTH = OiioTypes.HALF
     EXR_COMPRESSION: str = "dwaa:15"
@@ -71,6 +71,16 @@ elif PRESET.endswith("hq"):
         MEDIAN_PASSES = 10
         BDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Full
         EXR_COMPRESSION = "zips"
+elif PRESET == "neg":
+    OUTPUT_COLORSPACE = rawpy.ColorSpace.raw
+    HALF_SIZE = False
+    DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.DHT
+    MEDIAN_PASSES: int = 2
+    FBDD_NOISE_REDUCTION = rawpy.FBDDNoiseReductionMode.Off
+    EXPOSURE_HDR_MERGE = False
+    EXPOSURE_SHIFT: Optional[float] = None
+    EXR_BITDEPTH = OiioTypes.HALF
+    EXR_COMPRESSION: str = "dwaa:15"
 else:
     HALF_SIZE = False
     DEMOSAIC_ALGORITHM = rawpy.DemosaicAlgorithm.AHD
