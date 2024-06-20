@@ -36,6 +36,7 @@ OVERWRITE_EXISTING = False
 
 # choose between "fastpreview", "normal", "hq", "uhq", "custom"
 PRESET = "normal"
+OUTPUT_COLORSPACE = rawpy.ColorSpace.raw
 
 if PRESET == "fastpreview":
     HALF_SIZE = True
@@ -102,7 +103,7 @@ def retrieve_output_path(src_path: Path) -> Path:
 
         return parent / name
 
-    return src_path.with_suffix(".exr")
+    return src_path.with_suffix(f".{OUTPUT_COLORSPACE.name}.{PRESET}.exr")
 
 
 OUTPUT_PATH_CALLABLE = retrieve_output_path
@@ -172,7 +173,7 @@ def main():
     debayering_options = rawpy.Params(
         output_bps=16,
         use_camera_wb=True,
-        output_color=rawpy.ColorSpace.XYZ,
+        output_color=OUTPUT_COLORSPACE,
         no_auto_bright=True,
         gamma=(1.0, 1.0),
         demosaic_algorithm=DEMOSAIC_ALGORITHM,
