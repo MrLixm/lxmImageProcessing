@@ -61,7 +61,7 @@ def get_cli() -> argparse.ArgumentParser:
         help=(
             "filesystem path to write the final prores video to."
             "the path can include the following tokens: \n"
-            "{datarate},{quality} \n"
+            "{input_filestem},{datarate},{quality} \n"
             "which value are retrieved from the arguments provided."
         ),
     )
@@ -124,7 +124,8 @@ def execute(argv: list[str] = None) -> Path:
     quality: int = parsed.quality
     extra_args = parsed.extra
     # replace tokens
-    dst_path: str = output_path.replace("{datarate}", datarate.name)
+    dst_path: str = output_path.replace("{input_filestem}", input_path.stem)
+    dst_path: str = dst_path.replace("{datarate}", datarate.name)
     dst_path: str = dst_path.replace("{quality}", str(quality))
     dst_path: Path = Path(dst_path)
 
