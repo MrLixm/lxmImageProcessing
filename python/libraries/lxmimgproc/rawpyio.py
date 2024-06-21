@@ -1,9 +1,7 @@
 import contextlib
 import copy
 import logging
-import time
 from pathlib import Path
-from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor
 from typing import Literal
 from typing import Optional
@@ -49,6 +47,11 @@ METADATA
 def get_camera_matrix(raw_path: Path) -> numpy.ndarray:
     """
     Extract the camera matrix from the given raw file.
+
+    TO VERIFY:
+    matrices are expressed as "sRGB > specified colorspace"
+    https://github.com/LibRaw/LibRaw/blob/21368133a94fbc35f594112a737d36f7ce65c7c0/src/tables/colorconst.cpp
+    https://github.com/LibRaw/LibRaw/blob/21368133a94fbc35f594112a737d36f7ce65c7c0/src/postprocessing/postprocessing_utils_dcrdefs.cpp#L30
 
     Args:
         raw_path: existing path to the camera raw file to extract the matrix from
@@ -97,21 +100,9 @@ def get_camera_whitebalance(
     return tuple(whitebalance[:3])
 
 
-def rawpyget_metadata(
+def rawpymeta_file(
     src_file_path: Path,
-    debayering_options: DebayeringOptionsType,
 ) -> dict[str, str]:
-    """
-    Get raw file "metadata" as a dictionary.
-
-    Args:
-        src_file_path: filesystem path to an existing raw file
-        debayering_options: rawpy debayering options used to debayer the src file path
-
-    Returns:
-        a dict of metadata formatted in a custom way.
-        keys use camelCase convention for naming
-    """
     cm = get_camera_matrix(src_file_path)
     camera_matrix = f"{cm[0][0]}, {cm[1][0]}, {cm[2][0]}, "
     camera_matrix += f"{cm[1][0]}, {cm[1][1]}, {cm[1][2]}, "
@@ -127,25 +118,31 @@ def rawpyget_metadata(
 
     wc = get_camera_whitebalance(src_file_path, daylight=False)
     whitebalance_coeffs = f"{wc[0]}, {wc[1]}, {wc[2]}"
-
-    # more details :
-    #   matrices are expressed as "sRGB > specified colorspace"
-    # https://github.com/LibRaw/LibRaw/blob/21368133a94fbc35f594112a737d36f7ce65c7c0/src/tables/colorconst.cpp
-    # https://github.com/LibRaw/LibRaw/blob/21368133a94fbc35f594112a737d36f7ce65c7c0/src/postprocessing/postprocessing_utils_dcrdefs.cpp#L30
-    colorspace_mapping = {
-        rawpy.ColorSpace.raw: "raw",
-        rawpy.ColorSpace.ACES: "ACES2065-1 linear",
-        rawpy.ColorSpace.Adobe: "AdobeRGB(1998) linear",
-        rawpy.ColorSpace.P3D65: "DCI-P3 linear D65",
-        rawpy.ColorSpace.ProPhoto: "ProPhoto linear D65",
-        rawpy.ColorSpace.Rec2020: "BT.2020 linear",
-        rawpy.ColorSpace.sRGB: "sRGB linear",
-        rawpy.ColorSpace.Wide: "WideGamut linear D65",
-        rawpy.ColorSpace.XYZ: "CIE-XYZ linear D65",
+    return {
+        "cameraMatrix": camera_matrix,
+        "cameraToXYZ": rgb2XYZ_matrix,
+        "whiteBalanceDaylight": whitebalance_d_coeffs,
+        "whiteBalance": whitebalance_coeffs,
     }
+
+
+def rawpymeta_debayering(
+    debayering_options: DebayeringOptionsType,
+) -> dict[str, str]:
+    """
+    Convert the given debayering options a pontetial metadata specified as key/value pair.
+
+    Args:
+        src_file_path: filesystem path to an existing raw file
+        debayering_options: rawpy debayering options used to debayer the src file path
+
+    Returns:
+        a dict of metadata formatted in a custom way.
+        keys use camelCase convention for naming
+    """
     colorspace = debayering_options.output_color
     colorspace = rawpy.ColorSpace(colorspace)
-    colorspace = colorspace_mapping.get(colorspace, "unknown")
+    colorspace = colorspace.name
 
     demosaic_id = debayering_options.user_qual
     try:
@@ -157,10 +154,6 @@ def rawpyget_metadata(
     return {
         "colorspace": colorspace,
         "gamma": str(debayering_options.gamm),
-        "cameraMatrix": camera_matrix,
-        "cameraToXYZ": rgb2XYZ_matrix,
-        "whiteBalanceDaylight": whitebalance_d_coeffs,
-        "whiteBalance": whitebalance_coeffs,
         "useCameraWhiteBalance": debayering_options.use_camera_wb,
         "demosaicAlgorithm": f"{demosaic_id} ({demosaic})",
         "medianPasses": debayering_options.med_passes,
