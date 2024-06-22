@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lxmImageProcessing"
-version = "0.1.0"
+version = "0.2.0"
 description = "Custom resources for image-processing."
 authors = ["Liam Collod <lcollod@gmail.com>"]
 readme = "README.md"
