@@ -5,6 +5,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 import cocoon
 
@@ -19,7 +20,7 @@ from lxmimgproc.oiioio import OiioExrCompression
 from lxmimgproc.exifio import exiftoolread_image_metadata
 from lxmimgproc.oiioio import oiio
 
-__VERSION__ = "2.0.0"
+__VERSION__ = "2.1.0"
 FILENAME = Path(__file__).stem
 LOGGER = logging.getLogger(FILENAME)
 
@@ -71,6 +72,7 @@ PRESETS = {
         exr_bitdepth=OiioTypes.HALF,
         exr_compression=OiioExrCompression.zips,
     ),
+    # used for film negative scanning
     "scan": ConversionPreset(
         half_size=False,
         demosaic_algorithm=rawpy.DemosaicAlgorithm.DHT,
@@ -93,6 +95,7 @@ def convert_raw_to_exr(
     exr_compression: OiioExrCompression | None = None,
     exr_compression_amount: float | None = None,
     exposure_shift: float = 0.0,
+    extra_metadata: dict[str, Any] | None = None,
 ):
     """
 
@@ -106,7 +109,10 @@ def convert_raw_to_exr(
         exr_compression:
         exr_compression_amount: only for "dwaa" and "dwab" compression.
         exposure_shift: exposure shift in stops where 0.0 = no change.
+        extra_metadata: mapping of metadataa name/value to embed in the outpout EXR.
     """
+    extra_metadata = extra_metadata or {}
+
     # retrieve metadata
     exif_metadata = exiftoolread_image_metadata(
         image_path=src_file_path,
@@ -146,15 +152,24 @@ def convert_raw_to_exr(
     imagebuf.specmod().attribute("compression", exr_compression)
 
     # set arbitrary metadata
-    imagebuf.specmod().attribute(f"raw-to-exr.py:version", __VERSION__)
+    # note: those attributes are not standard
     imagebuf.specmod().attribute(
-        f"colorspace", colorspace.name if colorspace else ".native"
+        f"colorspace-gamut",
+        colorspace.gamut.name if colorspace else ".native",
     )
+    imagebuf.specmod().attribute(
+        f"colorspace-whitepoint",
+        colorspace.whitepoint.name if colorspace else ".native",
+    )
+    imagebuf.specmod().attribute(f"colorspace-transfer_function", "linear")
     if chromaticities:
+        # note: this is standard OpenEXR attribute
         imagebuf.specmod().attribute(
             "chromaticities", oiio.TypeDesc.TypeVector, chromaticities
         )
 
+    for metadata_name, metadata_value in extra_metadata.items():
+        imagebuf.specmod().attribute(f"{metadata_name}", metadata_value)
     for metadata_name, metadata_value in rawpy_metadata.items():
         imagebuf.specmod().attribute(f"libraw:{metadata_name}", metadata_value)
     for metadata_name, metadata_value in exif_metadata.items():
@@ -321,6 +336,11 @@ def execute(argv: list[str] = None) -> Path:
     )
     LOGGER.debug(f"{debayering_options}")
 
+    extra_metadata = {
+        "raw-to-exr.py:version": __VERSION__,
+        "raw-to-exr.py:argv": " ".join(argv),
+    }
+
     start_time = time.time()
     LOGGER.info(f"processing '{input_path}' to '{dst_file_path}'")
     convert_raw_to_exr(
@@ -333,6 +353,7 @@ def execute(argv: list[str] = None) -> Path:
         exr_compression=preset.exr_compression,
         exr_compression_amount=preset.exr_compression_amount,
         exposure_shift=exposure_shift,
+        extra_metadata=extra_metadata,
     )
     LOGGER.info(f"generation took {time.time() - start_time:.2f}s")
 
