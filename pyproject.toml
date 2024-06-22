@@ -9,9 +9,9 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.10,<3.11"
 numpy = "1.26.*"
-colour-science = "0.4.3"
+cocoon = { git = "https://github.com/MrLixm/cocoon.git"}
 rawpy = "0.19.0"
 openimageio = { path = "./vendor/OpenImageIO/OpenImageIO-2.2.18.0-cp310-cp310-win_amd64.whl", markers = "sys_platform == 'win32'" }
 
