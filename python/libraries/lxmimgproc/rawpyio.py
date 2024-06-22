@@ -172,19 +172,6 @@ DEBAYERING
 """
 
 
-def rawpyget_recommended_debayering_options() -> DebayeringOptionsType:
-    """
-    Get options recommened o use for debayering in the loog workflow.
-    """
-    return rawpy.Params(
-        output_bps=16,
-        use_camera_wb=True,
-        output_color=rawpy.ColorSpace.raw,
-        no_auto_bright=True,
-        gamma=(1.0, 1.0),
-    )
-
-
 def rawpyread_image(
     raw_path: Path,
     options: DebayeringOptionsType,
@@ -210,69 +197,3 @@ def rawpyread_image(
         rgb = convert_bit_depth(rgb, bitdepth)
 
     return rgb
-
-
-def _process_exposure(raw_path: Path, options, exposure: float) -> numpy.ndarray:
-    LOGGER.debug(
-        f".../{raw_path.parent.parent.name}/{raw_path.parent.name}/{raw_path.name}: "
-        f"about to process exposure {exposure}"
-    )
-    exposure_options = copy.copy(options)
-    exposure_options.exp_shift = exposure
-    exposure_array = rawpyread_image(
-        raw_path,
-        options=exposure_options,
-        bitdepth="float32",
-    )
-    return exposure_array
-
-
-def rawpyread_image_mergehdr(
-    raw_path: Path,
-    options: DebayeringOptionsType,
-    # min value mentioned in the doc
-    exposure_start=0.25,
-    # must be lower than exposure_start + exposure_step * exposure_stack_n
-    exposure_step=1.25,
-    # arbitrary value
-    exposure_stack_n=6,
-) -> numpy.ndarray:
-    """
-    Convert a raw camera file to an R-G-B numpy array
-
-    Try to expand the dynamic range by merging multiple brackets retrieved from
-    scaling exposure before demosaicing.
-    Brackets are calculated as [(exposure_start + exposure_step) * exposure_stack_n]
-
-    Args:
-        raw_path: path to an existing dng file
-        options: demosaicing options
-        exposure_start: minimal exposure value to start bracketing from. minimum is 0.25
-        exposure_step: amount of exposure to add at each bracket
-        exposure_stack_n: number of exposures to demosaic using the
-
-     Returns:
-         RGB image encoded in float32
-    """
-
-    exposures = [exposure_start + exposure_step * n for n in range(exposure_stack_n)]
-
-    args_mapping = [(raw_path, options, exposure) for exposure in exposures]
-
-    # threading provides a minimal performance boost.
-    # it was initially for testing but was left for that small boost.
-    with ThreadPoolExecutor() as pool:
-        exposure_arrays = pool.map(
-            lambda p: _process_exposure(*p),
-            args_mapping,
-            # not sure if this makes a noticeable difference
-            chunksize=2,
-        )
-
-    exposure_arrays = list(exposure_arrays)
-
-    combined_array: numpy.ndarray = exposure_arrays.pop(0)
-    for array in exposure_arrays:
-        combined_array += array
-
-    return combined_array

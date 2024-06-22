@@ -10,7 +10,6 @@ import cocoon
 
 from lxmimgproc.rawpyio import rawpy
 from lxmimgproc.rawpyio import DebayeringOptionsType
-from lxmimgproc.rawpyio import rawpyread_image_mergehdr
 from lxmimgproc.rawpyio import rawpyread_image
 from lxmimgproc.rawpyio import rawpymeta_debayering
 from lxmimgproc.oiioio import oiioconvert_array_to_image
