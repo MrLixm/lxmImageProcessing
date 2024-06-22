@@ -6,18 +6,19 @@ Personal resources for image-processing which include topics like :
 * vfx
 
 The package is not fully designed for public consumptions so use at your own risks.
+Major changes can happen at any time.
 
 # content
 
 
-| tool                                                                            | description                                                 | type    | tag                                                  |
-|---------------------------------------------------------------------------------|-------------------------------------------------------------|---------|------------------------------------------------------|
-| [raw-to-dng.py](python/scripts/raw-to-dng.py)                                   | batch converting raw files to dng                           | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
-| [raw-to-exr.py](python/scripts/raw-to-exr.py)                                   | batch converting raw files to OpenEXR, including debayering | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
-| [rw2-to-dng.py](python/scripts/rw2-to-dng.py)                                   | batch converting panasonic raw file to dng (personal use)   | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
-| [session-to-mosaic.py](python/scripts/session-to-mosaic.py)                     | combine multiple image to a single big mosaic of image      | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
-| [ffmpeg-video-to-appleprores.py](python/scripts/ffmpeg-video-to-appleprores.py) | encode to apple prores using ffmpeg                         | script  | ![video](https://img.shields.io/badge/video-4c78a6)  |
-| [lxmImageProcessing](python/libraries/lxmimgproc)                       | python wrapper to interract with i-o libraries              | library | ![photo](https://img.shields.io/badge/photo-43896b)  |
+| tool                                                                         | description                                                 | type    | tag                                                  |
+|------------------------------------------------------------------------------|-------------------------------------------------------------|---------|------------------------------------------------------|
+| [raw-to-dng.py](scripts/raw-to-dng.py)                                       | batch converting raw files to dng                           | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
+| [raw-exr-converter.py](scripts/raw-exr-converter.py)                         | batch converting raw files to OpenEXR, including debayering | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
+| [rw2-to-dng.py](scripts/rw2-to-dng.py)                                       | batch converting panasonic raw file to dng (personal use)   | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
+| [mosaic-generator.py](scripts/mosaic-generator.py)                           | combine multiple image to a single big mosaic of image      | script  | ![photo](https://img.shields.io/badge/photo-43896b)  |
+| [ffmpeg-apple-prores-converter.py](scripts/ffmpeg-apple-prores-converter.py) | encode to apple prores using ffmpeg                         | script  | ![video](https://img.shields.io/badge/video-4c78a6)  |
+| [lxmImageProcessing](python/libraries/lxmimgproc)                            | python wrapper to interract with i-o libraries              | library | ![photo](https://img.shields.io/badge/photo-43896b)  |
 
 
 # installation
