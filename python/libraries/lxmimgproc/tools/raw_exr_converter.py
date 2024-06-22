@@ -131,6 +131,8 @@ def convert_raw_to_exr(
     chromaticities = None
     if colorspace is not None:
         chromaticities = cocoon.colorspace_to_exr_chromaticities(colorspace)
+        if not chromaticities:
+            LOGGER.warning(f"cannot generate chromaticities from '{colorspace}'")
         # XXX: we force conversion to XYZ in the debayering_options
         LOGGER.debug(f"cocoon.XYZ_to_colorspace(..., {colorspace.name}, ...)")
         image_array = cocoon.XYZ_to_colorspace(
@@ -165,7 +167,7 @@ def convert_raw_to_exr(
     if chromaticities:
         # note: this is standard OpenEXR attribute
         imagebuf.specmod().attribute(
-            "chromaticities", oiio.TypeDesc.TypeVector, chromaticities
+            "chromaticities", oiio.TypeDesc("float[8]"), chromaticities
         )
 
     for metadata_name, metadata_value in extra_metadata.items():
