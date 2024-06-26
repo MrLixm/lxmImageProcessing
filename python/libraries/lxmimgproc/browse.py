@@ -47,6 +47,10 @@ def get_dir_content(
             recursive_children.append(child_path)
 
         if child_entry.is_dir() and recursive:
-            recursive_children += get_dir_content(child_path, recursive=True)
+            recursive_children += get_dir_content(
+                child_path,
+                recursive=True,
+                file_extensions=file_extensions,
+            )
 
     return recursive_children
