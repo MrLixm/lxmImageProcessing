@@ -1,4 +1,4 @@
-# lxmImageProcessing
+# image-processing-lxm
 
 Personal resources for image-processing which include topics like :
 * photography
